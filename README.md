@@ -19,11 +19,15 @@ Or install it yourself as:
 
 ## Usage
 
+```ruby
 RubyApollo::ApolloClient.new(appId, cluster, namespace).start
+```
 
 #### example
 
+```ruby
 RubyApollo::ApolloClient.new('OhTest', 'SSSS', 'mach.yml').start
+```
 
 ## Development
 

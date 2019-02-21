@@ -17,10 +17,11 @@ module RubyApollo
       @project_name = project_name
       @cluster = cluster
       @namespace = namespace
-      @notification_map = { application: -1 }
+      @notification_map = { application: init_notification_id }
     end
 
     def start
+
       Thread.new { 
         EventMachine.run {
            EventMachine.add_periodic_timer(5) {
@@ -28,6 +29,23 @@ module RubyApollo
            } 
         }
       }
+    end
+    
+    def apollo_info
+      "#{project_name},#{cluster},#{namespace},#{notification_map[:application]}"
+    end
+
+    def init_notification_id
+      notification_info = File.read('config/apollo_info.txt')
+      record_project_name, record_cluster, record_namespace, record_id = notification_info.split(',')
+
+      if record_project_name == project_name &&
+         record_cluster == cluster &&
+         record_namespace == namespace &&
+         record_id != nil
+        return record_id.to_i
+      end
+      return -1
     end
 
     def get_cached_data(url)
@@ -49,7 +67,7 @@ module RubyApollo
     end
 
     def write_yml(data)
-      File.write('config/application.yml', data)
+      File.write('config/test.yml', data)
     end
 
     def long_poll
@@ -81,6 +99,7 @@ module RubyApollo
         p "[Apollo] Api notificatitons v2 config changed: #{body}"
         get_uncached_data(splice_url('configs'))
         notification_map[:application] = body.first['notificationId']
+        File.write('config/apollo_info.txt', apollo_info)
       elsif response.code == '304'
         p '[Apollo] There is no HTTPNotModified'
       elsif response.code == '400'
