@@ -8,8 +8,8 @@ module RubyApollo
   class Error < StandardError; end
 
   class ApolloClient
-    # HOST = 'https://apollo-portal.feedmob.com'
-    HOST = 'http://106.12.25.204:8080'
+    # HOST like 'https://xxx.com'
+    HOST = ''
 
     attr_reader :project_name, :cluster, :namespace, :notification_map
 
@@ -21,7 +21,6 @@ module RubyApollo
     end
 
     def start
-
       Thread.new { 
         EventMachine.run {
            EventMachine.add_periodic_timer(5) {
@@ -42,9 +41,11 @@ module RubyApollo
       if record_project_name == project_name &&
          record_cluster == cluster &&
          record_namespace == namespace &&
+
          record_id != nil
         return record_id.to_i
       end
+
       return -1
     end
 
@@ -107,6 +108,7 @@ module RubyApollo
       elsif resonse.code == '404'
         p '[Apollo] Not Found with error params'
       end
+
       rescue Net::ReadTimeout
     end
 
